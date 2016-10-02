@@ -26,22 +26,24 @@ func TestCanReadConfig(t *testing.T) {
 		t.Error()
 	}
 	var yamlExample = []byte(`
-Hacker: true
-name: steve
-hobbies:
-- skateboarding
-- snowboarding
-- go
-clothing:
-  jacket: leather
-  trousers: denim
-age: 35
-eyes : brown
-beard: true
+movies:
+  exts:
+  - mkv
+  - avi
+  patterns:
+  - /[sS]([0-9]+)[eE]([0-9]+).+(720p|1080p)?/
+  result: S$1E$2
 `)
 	afero.WriteFile(appFs, usr.HomeDir+"/.massnomer.yaml", yamlExample, 0755)
 	initConfig()
-	viper.Get("name")
-	assert.Equal(t, viper.Get("name"), "steve")
-	assert.Equal(t, viper.GetStringSlice("hobbies")[0], "skateboarding")
+	assert.Equal(t, viper.GetStringSlice("movies.exts")[0], "mkv")
+	assert.Equal(t, viper.GetString("movies.result"), "S$1E$2")
+}
+
+func TestHasDefaultProfiles(t *testing.T) {
+	defer viper.Reset()
+
+	initConfig()
+	assert.Equal(t, viper.GetStringSlice("shows.exts")[0], "mkv")
+	assert.Equal(t, viper.GetStringSlice("shows.patterns")[0], "/[sS]([0-9]+)[eE]([0-9]+).+(720p|1080p)?/")
 }

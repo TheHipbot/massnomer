@@ -81,6 +81,15 @@ func initConfig() {
 	viper.AddConfigPath("$HOME")      // adding home directory as first search path
 	viper.AutomaticEnv()              // read in environment variables that match
 
+	// set default profiles
+	shows := map[string]interface{}{
+		"exts":     []string{"mkv", "avi"},
+		"patterns": []string{"/[sS]([0-9]+)[eE]([0-9]+).+(720p|1080p)?/"},
+		"result":   "S$1E$2 $3",
+	}
+
+	viper.SetDefault("shows", shows)
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
