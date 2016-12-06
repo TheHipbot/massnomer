@@ -1,4 +1,4 @@
-// Copyright © 2016 NAME HERE jeremy@thehipbot.com
+// Copyright © 2016 Jeremy 'TheHipbot' Chambers jeremy@thehipbot.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -24,8 +25,10 @@ import (
 )
 
 var (
-	cfgFile string
 	appFs   afero.Fs
+	cfgFile string
+	profile string
+	recur   bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -34,15 +37,15 @@ var RootCmd = &cobra.Command{
 	Short: "A multifile renaming tool",
 	Long: `A tool which can be used to rename files based on search
 and replace patterns. Has some base configurations but can be extended
-with your own patterns 
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+with your own patterns.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if !viper.IsSet(profile) {
+			return errors.New("profile not found")
+		}
 		moveFile()
+		return nil
 	},
 }
 
@@ -67,6 +70,12 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// Rename profile to use
+	RootCmd.PersistentFlags().StringVar(&profile, "profile", "p", "profile to use from defaults or defined in config")
+
+	// TODO recursive option
+	// RootCmd.PersistentFlags().StringVar(&recur, "recursive", "r", "search and rename files recursively")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -98,4 +107,8 @@ func initConfig() {
 
 func moveFile() {
 	appFs.Rename("testingblah", "testingnot")
+}
+
+func getFileMappings(cmd *cobra.Command, args []string) {
+
 }

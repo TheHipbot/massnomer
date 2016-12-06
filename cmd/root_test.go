@@ -32,18 +32,23 @@ movies:
   - avi
   patterns:
   - /[sS]([0-9]+)[eE]([0-9]+).+(720p|1080p)?/
-  result: S$1E$2
+  result: S$1E$2 $3
 `)
 	afero.WriteFile(appFs, usr.HomeDir+"/.massnomer.yaml", yamlExample, 0755)
 	initConfig()
 	assert.Equal(t, viper.GetStringSlice("movies.exts")[0], "mkv")
-	assert.Equal(t, viper.GetString("movies.result"), "S$1E$2")
+	assert.Equal(t, viper.GetString("movies.result"), "S$1E$2 $3")
 }
 
 func TestHasDefaultProfiles(t *testing.T) {
+	// TODO flesh out once defaults are well defined
 	defer viper.Reset()
 
 	initConfig()
 	assert.Equal(t, viper.GetStringSlice("shows.exts")[0], "mkv")
 	assert.Equal(t, viper.GetStringSlice("shows.patterns")[0], "/[sS]([0-9]+)[eE]([0-9]+).+(720p|1080p)?/")
+}
+
+func TestFindMatchingFiles(t *testing.T) {
+
 }
